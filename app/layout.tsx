@@ -3,20 +3,22 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Sidebar from '@/components/Sidebar'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: 'PensionPilot – Swiss Pension Dashboard',
-  description: 'Manage your Swiss 3-pillar pension with clarity and confidence.',
+  title: { default: 'PensionPilot', template: '%s · PensionPilot' },
+  description: 'Swiss 3-pillar pension dashboard — see everything in one place, know exactly what to do.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-slate-50 min-h-screen`}>
+    <html lang="en" className={inter.variable}>
+      <body className="bg-slate-50 min-h-screen font-sans">
         <div className="flex min-h-screen">
           <Sidebar />
-          <main className="flex-1 ml-64 p-8">{children}</main>
+          <main className="flex-1 ml-64 p-8 min-h-screen">
+            {children}
+          </main>
         </div>
       </body>
     </html>

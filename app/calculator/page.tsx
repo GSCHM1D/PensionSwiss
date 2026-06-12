@@ -1,131 +1,186 @@
 'use client'
 
 import { useState } from 'react'
-import { Calculator } from 'lucide-react'
+import { Calculator, Info } from 'lucide-react'
 import { chf } from '@/lib/formatters'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts'
 
-function project(params: {
-  currentAge: number
+interface Params {
+  yearsLeft:     number
+  extraMonthly:  number
+  growthRate:    number
   retirementAge: number
-  ahv: number
-  bvg: number
-  p3: number
-  monthlySavings: number
-  growthRate: number
-}) {
-  const { currentAge, retirementAge, ahv, bvg, p3, monthlySavings, growthRate } = params
-  const years = retirementAge - currentAge
-  const r = growthRate / 100
+}
 
-  const futureAhv = ahv * Math.pow(1 + 0.012, years)
-  const futureBvg = (bvg + monthlySavings * 6 * 12 * years / years) * Math.pow(1 + r, years)
-  const futureP3  = (p3 + monthlySavings * 4 * 12 * years / years) * Math.pow(1 + r + 0.01, years)
+interface Result {
+  total:        number
+  monthlyIncome: number
+  ahv:          number
+  bvg:          number
+  p3:           number
+}
 
+function project({ yearsLeft, extraMonthly, growthRate }: Params): Result {
+  const r    = growthRate / 100
+  const ahv  = 420_000 * Math.pow(1.012, yearsLeft)
+  const bvg  = (285_000 + extraMonthly * 0.6 * 12) * Math.pow(1 + r, yearsLeft)
+  const p3   = (98_500  + extraMonthly * 0.4 * 12) * Math.pow(1 + r + 0.01, yearsLeft)
+  const total = ahv + bvg + p3
   return {
-    total: futureAhv + futureBvg + futureP3,
-    ahv:   futureAhv,
-    bvg:   futureBvg,
-    p3:    futureP3,
-    monthlyIncome: (futureAhv * 0.068 + futureBvg * 0.068 + futureP3 * 0.04) / 12,
+    total,
+    monthlyIncome: (bvg * 0.068 + p3 * 0.035 + ahv * 0.068) / 12,
+    ahv, bvg, p3,
   }
 }
 
-function buildChartData(params: ReturnType<typeof project> & { currentAge: number; retirementAge: number }) {
-  return [
-    { name: 'Current',   AHV: 420_000, BVG: 285_000, 'Pillar 3': 98_500 },
-    { name: 'At Retirement', AHV: Math.round(params.ahv), BVG: Math.round(params.bvg), 'Pillar 3': Math.round(params.p3) },
-  ]
+function Scenario({ label, params, highlight }: { label: string; params: Params; highlight?: boolean }) {
+  const r = project(params)
+  return (
+    <div className={`rounded-xl p-4 border ${highlight ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-slate-50'}`}>
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="text-2xl font-bold text-slate-900 mt-1">{chf(r.total)}</p>
+      <p className="text-xs text-slate-500 mt-0.5">{chf(r.monthlyIncome)} / month</p>
+    </div>
+  )
 }
 
 export default function CalculatorPage() {
-  const [currentAge,    setCurrentAge]    = useState(44)
   const [retirementAge, setRetirementAge] = useState(65)
-  const [monthlySavings,setMonthlySavings]= useState(1_500)
-  const [growthRate,    setGrowthRate]    = useState(4.0)
+  const [extraMonthly,  setExtraMonthly]  = useState(500)
+  const [growthRate,    setGrowthRate]    = useState(4)
 
-  const result = project({ currentAge, retirementAge, ahv: 420_000, bvg: 285_000, p3: 98_500, monthlySavings, growthRate })
-  const chartData = buildChartData({ ...result, currentAge, retirementAge })
+  const yearsLeft = retirementAge - 44
+  const params    = { yearsLeft, extraMonthly, growthRate, retirementAge }
+  const result    = project(params)
+
+  const chartData = [
+    {
+      name: 'Today',
+      AHV: 420_000, BVG: 285_000, 'Pillar 3': 98_500,
+    },
+    {
+      name: `Age ${retirementAge}`,
+      AHV: Math.round(result.ahv), BVG: Math.round(result.bvg), 'Pillar 3': Math.round(result.p3),
+    },
+  ]
 
   return (
-    <div className="space-y-8 max-w-4xl">
+    <div className="space-y-6 max-w-5xl">
+      {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
           <Calculator size={20} className="text-blue-600" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Retirement Calculator</h1>
-          <p className="text-slate-500 text-sm">Simulate your pension trajectory with custom assumptions</p>
+          <p className="text-slate-500 text-sm">Simulate your trajectory — adjust assumptions and compare scenarios</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-8">
-        {/* Inputs */}
-        <div className="col-span-1 card space-y-5">
-          <h2 className="font-semibold text-slate-800">Parameters</h2>
+      <div className="grid grid-cols-5 gap-5">
+        {/* Controls */}
+        <div className="col-span-2 card space-y-6">
+          <p className="section-title">Your assumptions</p>
 
-          {[
-            { label: 'Current age',      value: currentAge,     setter: setCurrentAge,     min: 18,  max: 64, step: 1,   suffix: 'yrs' },
-            { label: 'Retirement age',   value: retirementAge,  setter: setRetirementAge,  min: 58,  max: 70, step: 1,   suffix: 'yrs' },
-            { label: 'Monthly savings',  value: monthlySavings, setter: setMonthlySavings, min: 0,   max: 10000, step: 100, suffix: 'CHF' },
-            { label: 'Growth rate (BVG/3a)', value: growthRate, setter: setGrowthRate,    min: 0,   max: 12, step: 0.5, suffix: '%'   },
-          ].map(({ label, value, setter, min, max, step, suffix }) => (
-            <div key={label}>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-slate-600">{label}</span>
-                <span className="font-semibold text-slate-900">{suffix === 'CHF' ? chf(value) : `${value} ${suffix}`}</span>
-              </div>
-              <input
-                type="range"
-                min={min}
-                max={max}
-                step={step}
-                value={value}
-                onChange={e => setter(Number(e.target.value))}
-                className="w-full accent-blue-600"
-              />
+          {/* Retirement age */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="label mb-0">Retirement age</label>
+              <span className="text-sm font-bold text-blue-700">{retirementAge} years</span>
             </div>
-          ))}
-        </div>
-
-        {/* Results */}
-        <div className="col-span-2 space-y-5">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="card border border-blue-100 bg-blue-50">
-              <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">Projected Total Assets</p>
-              <p className="text-3xl font-bold text-slate-900 mt-1">{chf(result.total)}</p>
-              <p className="text-xs text-slate-400 mt-0.5">At age {retirementAge}</p>
-            </div>
-            <div className="card border border-green-100 bg-green-50">
-              <p className="text-xs font-semibold uppercase tracking-wide text-green-600">Est. Monthly Income</p>
-              <p className="text-3xl font-bold text-slate-900 mt-1">{chf(result.monthlyIncome)}</p>
-              <p className="text-xs text-slate-400 mt-0.5">All pillars combined</p>
+            <input type="range" min={58} max={70} step={1} value={retirementAge}
+              onChange={e => setRetirementAge(Number(e.target.value))} />
+            <div className="flex justify-between text-xs text-slate-400 mt-1">
+              <span>58</span><span>70</span>
             </div>
           </div>
 
+          {/* Extra monthly savings */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="label mb-0">Additional monthly savings</label>
+              <span className="text-sm font-bold text-blue-700">{chf(extraMonthly)}</span>
+            </div>
+            <input type="range" min={0} max={3000} step={100} value={extraMonthly}
+              onChange={e => setExtraMonthly(Number(e.target.value))} />
+            <div className="flex justify-between text-xs text-slate-400 mt-1">
+              <span>CHF 0</span><span>CHF 3'000</span>
+            </div>
+          </div>
+
+          {/* Growth rate */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="label mb-0">Investment growth rate</label>
+              <span className="text-sm font-bold text-blue-700">{growthRate.toFixed(1)}%</span>
+            </div>
+            <input type="range" min={0} max={10} step={0.5} value={growthRate}
+              onChange={e => setGrowthRate(Number(e.target.value))} />
+            <div className="flex justify-between text-xs text-slate-400 mt-1">
+              <span>0%</span><span>10%</span>
+            </div>
+          </div>
+
+          {/* Years until retirement */}
+          <div className="rounded-xl bg-slate-50 p-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-slate-500">Years until retirement</span>
+              <span className="font-bold text-slate-900">{yearsLeft} yrs</span>
+            </div>
+            <div className="flex justify-between mt-1">
+              <span className="text-slate-500">AHV growth (fixed)</span>
+              <span className="font-bold text-slate-900">1.2% p.a.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="col-span-3 space-y-4">
+          {/* Main result */}
+          <div className="card border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 text-center py-8">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-500">Projected total at age {retirementAge}</p>
+            <p className="text-5xl font-bold text-slate-900 mt-2">{chf(result.total)}</p>
+            <p className="text-lg text-slate-600 mt-2">
+              ≈ <span className="font-bold text-slate-800">{chf(result.monthlyIncome)}</span> / month
+            </p>
+          </div>
+
+          {/* 3 scenarios */}
+          <div className="grid grid-cols-3 gap-3">
+            <Scenario label="Conservative (2%)" params={{ ...params, growthRate: 2 }} />
+            <Scenario label="Your scenario" params={params} highlight />
+            <Scenario label="Optimistic (7%)" params={{ ...params, growthRate: 7 }} />
+          </div>
+
+          {/* Bar chart */}
           <div className="card">
-            <h2 className="font-semibold text-slate-800 mb-4">Asset Breakdown: Now vs Retirement</h2>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
+            <p className="section-title">Today vs. Retirement</p>
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                <YAxis tickFormatter={v => `CHF ${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} width={80} />
+                <YAxis tickFormatter={v => `${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} width={50} />
                 <Tooltip formatter={(v: number) => chf(v)} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
                 <Bar dataKey="AHV"      fill="#22c55e" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="BVG"      fill="#f59e0b" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Pillar 3" fill="#f43f5e" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-
-          <p className="text-xs text-slate-400">
-            Projections are estimates only. AHV grows at 1.2 % p.a. (inflation). BVG and Pillar 3a/3b grow at the selected rate.
-            Monthly income assumes 6.8 % conversion rate for BVG and 4 % drawdown for 3rd pillar.
-          </p>
         </div>
+      </div>
+
+      {/* Disclaimer */}
+      <div className="flex items-start gap-2 text-xs text-slate-400 bg-slate-50 rounded-xl px-4 py-3">
+        <Info size={14} className="shrink-0 mt-0.5" />
+        <p>
+          Projections are illustrative only. AHV grows at 1.2% p.a. (inflation adjustment).
+          Monthly retirement income assumes 6.8% BVG conversion rate and 3.5% drawdown for 3rd pillar.
+          Consult a licensed pension advisor for personalised advice.
+        </p>
       </div>
     </div>
   )

@@ -8,24 +8,23 @@ interface StatCardProps {
   icon?: React.ReactNode
 }
 
-const accentMap = {
-  blue:  'bg-blue-50  text-blue-600  border-blue-100',
-  green: 'bg-green-50 text-green-600 border-green-100',
-  amber: 'bg-amber-50 text-amber-600 border-amber-100',
-  rose:  'bg-rose-50  text-rose-600  border-rose-100',
+const styles = {
+  blue:  { border: 'border-blue-100',  bg: 'bg-blue-50',  title: 'text-blue-600'  },
+  green: { border: 'border-green-100', bg: 'bg-green-50', title: 'text-green-600' },
+  amber: { border: 'border-amber-100', bg: 'bg-amber-50', title: 'text-amber-600' },
+  rose:  { border: 'border-rose-100',  bg: 'bg-rose-50',  title: 'text-rose-600'  },
 }
 
 export default function StatCard({ label, value, sub, accent = 'blue', icon }: StatCardProps) {
+  const s = styles[accent]
   return (
-    <div className={clsx('card flex items-start gap-4 border', accentMap[accent])}>
-      {icon && (
-        <div className="mt-0.5 shrink-0">{icon}</div>
-      )}
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-        <p className="text-2xl font-bold text-slate-900 mt-0.5">{value}</p>
-        {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
+    <div className={clsx('card border h-full', s.border, s.bg)}>
+      <div className="flex items-center gap-2 mb-3">
+        {icon}
+        <p className={clsx('text-xs font-semibold uppercase tracking-wide', s.title)}>{label}</p>
       </div>
+      <p className="text-2xl font-bold text-slate-900">{value}</p>
+      {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
     </div>
   )
 }
