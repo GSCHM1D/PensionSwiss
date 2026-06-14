@@ -2,7 +2,7 @@ import { Settings, User, Bell, Lock } from 'lucide-react'
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="space-y-8 max-w-3xl">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
           <Settings size={20} className="text-slate-600" />
@@ -18,20 +18,29 @@ export default function SettingsPage() {
         </div>
         <div className="grid grid-cols-2 gap-4">
           {[
-            { label: 'First name',   value: 'Gabriel' },
-            { label: 'Last name',    value: 'Schmid' },
-            { label: 'Date of birth', value: '01.01.1982' },
-            { label: 'AHV number',   value: '756.xxxx.xxxx.xx' },
-            { label: 'Canton',       value: 'Zurich' },
-            { label: 'Employment',   value: 'Employed' },
-          ].map(({ label, value }) => (
+            { label: 'First name',   value: 'Gabriel', locked: false },
+            { label: 'Last name',    value: 'Schmid', locked: false },
+            { label: 'Date of birth', value: '01.01.1982', locked: false },
+            { label: 'AHV number',   value: '756.xxxx.xxxx.xx', locked: true },
+            { label: 'Canton',       value: 'Zurich', locked: false },
+            { label: 'Employment',   value: 'Employed', locked: false },
+          ].map(({ label, value, locked }) => (
             <div key={label}>
               <label className="block text-xs font-medium text-slate-500 mb-1">{label}</label>
-              <input
-                type="text"
-                defaultValue={value}
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  defaultValue={value}
+                  readOnly={locked}
+                  autoComplete="off"
+                  className={`w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    locked ? 'font-mono tracking-widest bg-slate-50 text-slate-500 pr-9 cursor-not-allowed' : ''
+                  }`}
+                />
+                {locked && (
+                  <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                )}
+              </div>
             </div>
           ))}
         </div>

@@ -11,7 +11,7 @@ const nav = [
   { href: '/',           label: 'Dashboard',        icon: LayoutDashboard, badge: null },
   { href: '/pillar1',    label: '1st Pillar (AHV)', icon: Shield,          badge: null },
   { href: '/pillar2',    label: '2nd Pillar (BVG)', icon: Briefcase,       badge: null },
-  { href: '/pillar3',    label: '3rd Pillar',        icon: PiggyBank,       badge: 'Act by Dec 31' },
+  { href: '/pillar3',    label: '3rd Pillar',        icon: PiggyBank,       badge: '3a Frist' },
   { href: '/calculator', label: 'Calculator',        icon: Calculator,      badge: null },
   { href: '/settings',   label: 'Settings',          icon: Settings,        badge: null },
 ]
@@ -75,6 +75,11 @@ export default function Sidebar() {
             <p className="text-xs text-slate-400">Zurich · Age 44</p>
           </div>
         </div>
+      </div>
+
+      {/* Demo data notice */}
+      <div className="px-4 pb-3">
+        <span className="pill bg-slate-100 text-slate-400 text-[10px]">Demo data</span>
       </div>
     </aside>
   )

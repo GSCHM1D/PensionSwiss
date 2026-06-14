@@ -54,6 +54,3 @@ input[type='range'] {
 input[type='range']::-webkit-slider-thumb {
   @apply appearance-none w-4 h-4 bg-blue-600 rounded-full shadow-sm;
 }
-
-/* Smooth transitions */
-* { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
