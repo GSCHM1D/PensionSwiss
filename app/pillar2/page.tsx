@@ -1,4 +1,4 @@
-import { Briefcase, TrendingUp, Info } from 'lucide-react'
+import { Briefcase, TrendingUp, TrendingDown, Info } from 'lucide-react'
 import { chf, pct } from '@/lib/formatters'
 
 const CAPITAL    = 285_000
@@ -16,7 +16,7 @@ export default function Pillar2Page() {
   const beatsBenchmark = YTD_RETURN > BENCHMARK
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-5xl">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
@@ -38,8 +38,8 @@ export default function Pillar2Page() {
         <div className="card">
           <p className="label">YTD performance</p>
           <p className="text-3xl font-bold text-slate-900">+{pct(YTD_RETURN)}</p>
-          <p className={`text-xs font-semibold mt-2 ${beatsBenchmark ? 'text-green-600' : 'text-red-500'}`}>
-            {beatsBenchmark ? '▲' : '▼'} {beatsBenchmark ? '+' : ''}{pct(YTD_RETURN - BENCHMARK)} vs benchmark
+          <p className={`text-xs font-semibold mt-2 flex items-center gap-1 ${beatsBenchmark ? 'text-green-600' : 'text-red-500'}`}>
+            {beatsBenchmark ? <TrendingUp size={14} /> : <TrendingDown size={14} />} {beatsBenchmark ? '+' : ''}{pct(YTD_RETURN - BENCHMARK)} vs benchmark
           </p>
         </div>
         <div className="card">
@@ -87,7 +87,7 @@ export default function Pillar2Page() {
           <p className="font-semibold">Strategy recommendation</p>
           <p className="mt-0.5">
             At age 44 with 21 years to retirement, your current allocation (55% equities) may be too conservative.
-            Switching to a BVG 75 strategy could add an estimated <strong>+1.5% p.a.</strong>, worth ~<strong>CHF 28'000</strong> extra at retirement.
+            Switching to a higher-equity BVG strategy could add an estimated <strong>+1.5% p.a.</strong>, worth ~<strong>CHF 28'000</strong> extra at retirement.
             Contact your pension fund to check available options.
           </p>
         </div>

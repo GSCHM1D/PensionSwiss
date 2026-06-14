@@ -1,4 +1,4 @@
-import { Shield, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Shield, AlertTriangle, CheckCircle, Info } from 'lucide-react'
 import { chf } from '@/lib/formatters'
 
 const CONTRIB_YEARS  = 38
@@ -20,7 +20,7 @@ export default function Pillar1Page() {
   const pensionPct = Math.round((EXPECTED_MONTHLY / MAX_MONTHLY) * 100)
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-5xl">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
@@ -56,9 +56,9 @@ export default function Pillar1Page() {
 
         {/* Lifetime contributions */}
         <div className="card">
-          <p className="label">Total contributions (your share)</p>
-          <p className="text-3xl font-bold text-slate-900">{chf(420_000)}</p>
-          <p className="text-xs text-slate-400 mt-3">Employer matched the same amount</p>
+          <p className="label">Lifetime contributions paid</p>
+          <p className="text-3xl font-bold text-slate-900">{chf(138_000)}</p>
+          <p className="text-xs text-slate-400 mt-3">Your share of AHV premiums (no individual capital)</p>
           <p className="text-xs text-green-600 font-semibold mt-1">Contribution rate: 8.7% of gross salary</p>
         </div>
       </div>
@@ -76,6 +76,14 @@ export default function Pillar1Page() {
         <button className="btn-primary bg-amber-500 hover:bg-amber-600 shrink-0 text-xs">
           Contact SVA
         </button>
+      </div>
+
+      {/* Pay-as-you-go note */}
+      <div className="flex items-start gap-3 border border-blue-100 bg-blue-50 rounded-2xl p-4 text-sm text-blue-800">
+        <Info size={16} className="text-blue-500 shrink-0 mt-0.5" />
+        <p>
+          AHV operates on a pay-as-you-go basis — contributions fund current retirees, not a personal capital account.
+        </p>
       </div>
 
       {/* Contribution history */}

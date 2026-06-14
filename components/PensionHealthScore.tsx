@@ -1,3 +1,5 @@
+import { CheckCircle, AlertCircle } from 'lucide-react'
+
 interface Props {
   score: number
 }
@@ -40,10 +42,13 @@ export default function PensionHealthScore({ score }: Props) {
         </div>
       </div>
       <p className={`text-sm font-bold ${textClass}`}>{label}</p>
-      <div className="text-center text-xs text-slate-500 space-y-0.5 mt-1">
-        <p>✓ AHV 38 of 44 years complete</p>
-        <p>✓ BVG returns above benchmark</p>
-        <p className="text-amber-600 font-medium">· 3a not fully maxed this year</p>
+      <p className="text-[10px] text-slate-400 mt-2 text-center max-w-[160px]">
+        Based on AHV completeness, BVG performance vs. benchmark, and 3a utilisation
+      </p>
+      <div className="text-xs text-slate-500 space-y-0.5 mt-1">
+        <p className="flex items-center gap-1.5"><CheckCircle size={12} className="text-emerald-500 shrink-0" /> AHV 38 of 44 years complete</p>
+        <p className="flex items-center gap-1.5"><CheckCircle size={12} className="text-emerald-500 shrink-0" /> BVG returns above benchmark</p>
+        <p className="flex items-center gap-1.5 text-amber-600 font-medium"><AlertCircle size={12} className="shrink-0" /> 3a not fully maxed this year</p>
       </div>
     </div>
   )

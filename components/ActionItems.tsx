@@ -1,27 +1,28 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { chf } from '@/lib/formatters'
 
 const items = [
   {
     priority: 'high',
-    title:    'Max out your Pillar 3a',
-    detail:   'Contribute CHF 1\'656 more before 31 Dec — save ~CHF 497 in taxes.',
+    title:    'Maximise Pillar 3a contribution',
+    detail:   `Contribute ${chf(1_656)} more before 31 Dec — save ~${chf(497)} in taxes.`,
     href:     '/pillar3',
-    impact:   '+ CHF 497 saved',
+    impact:   `+ ${chf(497)} saved`,
   },
   {
     priority: 'medium',
     title:    'Fill AHV contribution gaps',
-    detail:   'Years 2003 & 2004 are missing. Back-payment ~CHF 1\'200 → higher pension for life.',
+    detail:   `Years 2003 & 2004 are missing. Back-payment ~${chf(1_200)} → higher pension for life.`,
     href:     '/pillar1',
     impact:   '+ CHF 48 / month',
   },
   {
     priority: 'low',
     title:    'Review BVG investment strategy',
-    detail:   'Your current allocation is conservative for your age. Switching to BVG 45 could yield +1.5% p.a.',
+    detail:   `Your current allocation is conservative for your age. Switching to a higher-equity BVG strategy could yield +1.5% p.a.`,
     href:     '/pillar2',
-    impact:   '+ CHF 28\'000 at retirement',
+    impact:   `+ ${chf(28_000)} at retirement`,
   },
 ]
 

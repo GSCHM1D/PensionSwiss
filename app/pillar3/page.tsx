@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { PiggyBank, CheckCircle, AlertCircle, TrendingUp } from 'lucide-react'
+import { PiggyBank, CheckCircle, XCircle, AlertCircle, TrendingUp } from 'lucide-react'
 import { chf } from '@/lib/formatters'
 
 const MAX_3A = 7_056
@@ -39,10 +39,11 @@ export default function Pillar3Page() {
   const [extra,  setExtra]  = useState(REMAINING)
 
   const rate    = CANTON_RATES[canton].rate[income]
-  const saving  = Math.round(extra * rate)
+  const savingLow  = Math.round(extra * (rate - 0.03) / 10) * 10
+  const savingHigh = Math.round(extra * (rate + 0.03) / 10) * 10
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-5xl">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center shrink-0">
@@ -50,7 +51,7 @@ export default function Pillar3Page() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-slate-900">3rd Pillar – Private Savings</h1>
-          <p className="text-slate-500 text-sm">Tied (3a) and flexible (3b) — your most powerful tax lever</p>
+          <p className="text-slate-500 text-sm">Tied (3a) and flexible (3b) — your most flexible private pension vehicle</p>
         </div>
       </div>
 
@@ -64,7 +65,7 @@ export default function Pillar3Page() {
             </p>
           </div>
           <span className={`pill shrink-0 ${REMAINING > 0 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>
-            {REMAINING > 0 ? `CHF ${REMAINING.toLocaleString('de-CH')} remaining` : 'Fully maxed ✓'}
+            {REMAINING > 0 ? `CHF ${REMAINING.toLocaleString('de-CH')} remaining` : 'Annual maximum reached'}
           </span>
         </div>
         <div className="flex items-center gap-3">
@@ -133,8 +134,8 @@ export default function Pillar3Page() {
           <CheckCircle size={28} className="text-green-500 shrink-0" />
           <div className="flex-1">
             <p className="text-lg font-bold text-slate-900">
-              Contribute <span className="text-rose-600">{chf(extra)}</span> more → save{' '}
-              <span className="text-green-700">{chf(saving)}</span> in taxes
+              Contribute <span className="text-rose-600">{chf(extra)}</span> more → save approx.{' '}
+              <span className="text-green-700">{chf(savingLow)}–{chf(savingHigh)}</span> in taxes
             </p>
             <p className="text-xs text-slate-500 mt-0.5">
               Based on ~{Math.round(rate * 100)}% marginal rate in {CANTON_RATES[canton].label}. Actual savings depend on your municipality and deductions.
@@ -178,7 +179,9 @@ export default function Pillar3Page() {
               { ok: false, text: 'Annual contribution cap applies' },
             ].map(({ ok, text }) => (
               <li key={text} className={`flex items-start gap-2 ${ok ? 'text-slate-700' : 'text-slate-400'}`}>
-                <span className="mt-0.5 shrink-0">{ok ? '✓' : '✗'}</span>
+                {ok
+                  ? <CheckCircle size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                  : <XCircle size={14} className="text-slate-300 shrink-0 mt-0.5" />}
                 <span>{text}</span>
               </li>
             ))}
@@ -190,13 +193,15 @@ export default function Pillar3Page() {
           </p>
           <ul className="text-sm space-y-2">
             {[
-              { ok: true,  text: 'No contribution limits — save as much as you want' },
+              { ok: true,  text: 'No statutory contribution limit' },
               { ok: true,  text: 'Freely accessible at any time' },
               { ok: false, text: 'No tax deduction on contributions' },
               { ok: false, text: 'Returns subject to income / wealth tax' },
             ].map(({ ok, text }) => (
               <li key={text} className={`flex items-start gap-2 ${ok ? 'text-slate-700' : 'text-slate-400'}`}>
-                <span className="mt-0.5 shrink-0">{ok ? '✓' : '✗'}</span>
+                {ok
+                  ? <CheckCircle size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                  : <XCircle size={14} className="text-slate-300 shrink-0 mt-0.5" />}
                 <span>{text}</span>
               </li>
             ))}
